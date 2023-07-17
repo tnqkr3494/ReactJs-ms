@@ -4,35 +4,35 @@ import { Categories, IToDo, toDoState } from "../atoms";
 
 function ToDo({ text, category, id }: IToDo) {
   const setToDos = useSetRecoilState(toDoState);
-  const onClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    const {
-      currentTarget: { name },
-    } = event;
+  const onClick = (newCategory: Categories) => {
     setToDos((oldToDos) => {
-      const targetIndex = oldToDos.findIndex((toDo) => toDo.id === id);
-      const newToDo = { text, id, category: name as any };
-      return [
-        ...oldToDos.slice(0, targetIndex),
-        newToDo,
-        ...oldToDos.slice(targetIndex + 1),
-      ];
+      const updateToDos = oldToDos.map((toDo) =>
+        toDo.id === id ? { ...toDo, category: newCategory } : toDo
+      );
+      return updateToDos;
     });
   };
   return (
     <li>
       <span>{text}</span>
       {category !== Categories.DOING && (
-        <button name={Categories.DOING} onClick={onClick}>
+        <button
+          name={Categories.DOING}
+          onClick={() => onClick(Categories.DOING)}
+        >
           Doing
         </button>
       )}
       {category !== Categories.TO_DO && (
-        <button name={Categories.TO_DO} onClick={onClick}>
+        <button
+          name={Categories.TO_DO}
+          onClick={() => onClick(Categories.TO_DO)}
+        >
           To Do
         </button>
       )}
       {category !== Categories.DONE && (
-        <button name={Categories.DONE} onClick={onClick}>
+        <button name={Categories.DONE} onClick={() => onClick(Categories.DONE)}>
           Done
         </button>
       )}
