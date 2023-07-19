@@ -82,9 +82,17 @@ function Board({ toDos, boardId }: IBoardProps) {
     });
     setValue("toDo", "");
   };
+  const removeBoard = () => {
+    setToDos((allBoards) => {
+      const { [boardId]: _, ...newBoard } = allBoards;
+      return { ...newBoard };
+    });
+  };
+
   return (
     <Wrapper>
       <Title>{boardId}</Title>
+      <button onClick={removeBoard}>remove {boardId}</button>
       <Form onSubmit={handleSubmit(onValid)}>
         <input
           {...register("toDo", { required: true })}

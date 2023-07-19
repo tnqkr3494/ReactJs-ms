@@ -3,6 +3,7 @@ import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { toDoState } from "./atoms";
 import Board from "./components/Board";
+import AddBoard from "./components/AddBoard";
 
 const Wrapper = styled.div`
   display: flex;
@@ -57,6 +58,7 @@ function App() {
   };
   return (
     <DragDropContext onDragEnd={onDragEnd}>
+      <AddBoard />
       <Wrapper>
         <Boards>
           {Object.keys(toDos).map((boardId) => (
