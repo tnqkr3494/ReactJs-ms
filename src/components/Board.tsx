@@ -88,7 +88,13 @@ function Board({ toDos, boardId }: IBoardProps) {
       return { ...newBoard };
     });
   };
-
+  const removeToDo = (index: number) => {
+    setToDos((allBoards) => {
+      const copyToDo = [...allBoards[boardId]];
+      copyToDo.splice(index, 1);
+      return { ...allBoards, [boardId]: copyToDo };
+    });
+  };
   return (
     <Wrapper>
       <Title>{boardId}</Title>
@@ -109,12 +115,17 @@ function Board({ toDos, boardId }: IBoardProps) {
             {...magic.droppableProps}
           >
             {toDos.map((toDo, index) => (
-              <DragabbleCard
-                key={toDo.id}
-                index={index}
-                toDoId={toDo.id}
-                toDoText={toDo.text}
-              />
+              <>
+                <DragabbleCard
+                  key={toDo.id}
+                  index={index}
+                  toDoId={toDo.id}
+                  toDoText={toDo.text}
+                />
+                <button onClick={() => removeToDo(index)}>
+                  remove {toDo.text}
+                </button>
+              </>
             ))}
             {magic.placeholder}
           </Area>
