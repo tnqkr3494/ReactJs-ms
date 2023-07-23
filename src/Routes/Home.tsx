@@ -35,7 +35,7 @@ const Title = styled.h2`
 `;
 
 const Overview = styled.p`
-  font-size: 30px;
+  font-size: 20px;
   width: 50%;
 `;
 
@@ -270,3 +270,12 @@ function Home() {
   );
 }
 export default Home;
+
+/*
+
+1. Home : 더 많은 영화 보여주기
+2. BigBox : detail로 api요청 보내서 더 만들어보기
+3. search : multi로 api요청 보내서 grid형태로 검색결과 보여주기
+4. tv : home과 비슷하게 만들어보기
+
+*/

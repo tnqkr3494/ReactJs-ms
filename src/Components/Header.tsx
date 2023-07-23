@@ -1,12 +1,8 @@
-import { Link, useRouteMatch } from "react-router-dom";
+import { Link, useRouteMatch, useHistory } from "react-router-dom";
 import styled from "styled-components";
-import {
-  motion,
-  useAnimation,
-  useMotionValueEvent,
-  useScroll,
-} from "framer-motion";
+import { motion, useAnimation, useViewportScroll } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 
 const Nav = styled(motion.nav)`
   display: flex;
@@ -54,7 +50,7 @@ const Item = styled.li`
   }
 `;
 
-const Search = styled.span`
+const Search = styled.form`
   color: white;
   display: flex;
   align-items: center;
@@ -68,7 +64,7 @@ const Circle = styled(motion.span)`
   position: absolute;
   width: 5px;
   height: 5px;
-  border-radius: 5px;
+  border-radius: 2.5px;
   bottom: -5px;
   left: 0;
   right: 0;
@@ -102,13 +98,17 @@ const logoVariants = {
 };
 
 const navVariants = {
-  start: {
+  top: {
     backgroundColor: "rgba(0, 0, 0, 0)",
   },
-  scrolled: {
+  scroll: {
     backgroundColor: "rgba(0, 0, 0, 1)",
   },
 };
+
+interface IForm {
+  keyword: string;
+}
 
 function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -116,7 +116,7 @@ function Header() {
   const tvMatch = useRouteMatch("/tv");
   const inputAnimation = useAnimation();
   const navAnimation = useAnimation();
-  const { scrollYProgress } = useScroll();
+  const { scrollY } = useViewportScroll();
   const toggleSearch = () => {
     if (searchOpen) {
       inputAnimation.start({
@@ -127,12 +127,22 @@ function Header() {
     }
     setSearchOpen((prev) => !prev);
   };
-  useMotionValueEvent(scrollYProgress, "change", (y) => {
-    if (y < 0.1) navAnimation.start("start");
-    else navAnimation.start("scrolled");
-  });
+  useEffect(() => {
+    scrollY.onChange(() => {
+      if (scrollY.get() > 80) {
+        navAnimation.start("scroll");
+      } else {
+        navAnimation.start("top");
+      }
+    });
+  }, [scrollY, navAnimation]);
+  const history = useHistory();
+  const { register, handleSubmit } = useForm<IForm>();
+  const onValid = (data: IForm) => {
+    history.push(`/search?keyword=${data.keyword}`);
+  };
   return (
-    <Nav variants={navVariants} animate={navAnimation} initial={"start"}>
+    <Nav variants={navVariants} animate={navAnimation} initial={"top"}>
       <Col>
         <Logo
           variants={logoVariants}
@@ -159,7 +169,7 @@ function Header() {
         </Items>
       </Col>
       <Col>
-        <Search>
+        <Search onSubmit={handleSubmit(onValid)}>
           <motion.svg
             onClick={toggleSearch}
             animate={{ x: searchOpen ? -185 : 0 }}
@@ -175,6 +185,7 @@ function Header() {
             ></path>
           </motion.svg>
           <Input
+            {...register("keyword", { required: true, minLength: 2 })}
             animate={inputAnimation}
             initial={{ scaleX: 0 }}
             transition={{ type: "linear" }}
