@@ -128,13 +128,17 @@ const BigOverview = styled.p`
 
 const rowVariants = {
   hidden: (isBack: boolean) => {
-    return { x: isBack ? -window.outerWidth - 5 : window.outerWidth + 5 };
+    return {
+      x: isBack ? -window.outerWidth - 5 : window.outerWidth + 5,
+    };
   },
   visible: {
     x: 0,
   },
   exit: (isBack: boolean) => {
-    return { x: isBack ? window.outerWidth + 5 : -window.outerWidth - 5 };
+    return {
+      x: isBack ? window.outerWidth + 5 : -window.outerWidth - 5,
+    };
   },
 };
 
@@ -216,7 +220,11 @@ function Home() {
             <Overview>{data?.results[0].overview}</Overview>
           </Banner>
           <Slider>
-            <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
+            <AnimatePresence
+              initial={false}
+              onExitComplete={toggleLeaving}
+              custom={isBack}
+            >
               <Row
                 custom={isBack}
                 variants={rowVariants}
