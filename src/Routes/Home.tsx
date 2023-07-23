@@ -127,14 +127,14 @@ const BigOverview = styled.p`
 `;
 
 const rowVariants = {
-  hidden: {
-    x: window.outerWidth + 5,
+  hidden: (isBack: boolean) => {
+    return { x: isBack ? -window.outerWidth - 5 : window.outerWidth + 5 };
   },
   visible: {
     x: 0,
   },
-  exit: {
-    x: -window.outerWidth - 5,
+  exit: (isBack: boolean) => {
+    return { x: isBack ? window.outerWidth + 5 : -window.outerWidth - 5 };
   },
 };
 
@@ -158,7 +158,7 @@ const infoVariants = {
     opacity: 1,
     transition: {
       delay: 0.5,
-      duaration: 0.1,
+      duration: 0.1,
       type: "tween",
     },
   },
@@ -175,13 +175,25 @@ function Home() {
   );
   const [index, setIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
+  const [isBack, setBack] = useState(false);
   const incraseIndex = () => {
     if (data) {
       if (leaving) return;
       toggleLeaving();
       const totalMovies = data.results.length - 1;
       const maxIndex = Math.floor(totalMovies / offset) - 1;
+      setBack(false);
       setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
+    }
+  };
+  const decreaseIndex = () => {
+    if (data) {
+      if (leaving) return;
+      toggleLeaving();
+      const totalMovies = data.results.length - 1;
+      const maxIndex = Math.floor(totalMovies / offset) - 1;
+      setBack(true);
+      setIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
     }
   };
   const toggleLeaving = () => setLeaving((prev) => !prev);
@@ -192,22 +204,21 @@ function Home() {
   const clickedMovie =
     bigMovieMatch?.params.movieId &&
     data?.results.find((movie) => movie.id === +bigMovieMatch.params.movieId);
+
   return (
     <Wrapper>
       {isLoading ? (
         <Loader>Loading...</Loader>
       ) : (
         <>
-          <Banner
-            onClick={incraseIndex}
-            bgPhoto={makeImagePath(data?.results[0].backdrop_path || "")}
-          >
+          <Banner bgPhoto={makeImagePath(data?.results[0].backdrop_path || "")}>
             <Title>{data?.results[0].title}</Title>
             <Overview>{data?.results[0].overview}</Overview>
           </Banner>
           <Slider>
             <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
               <Row
+                custom={isBack}
                 variants={rowVariants}
                 initial="hidden"
                 animate="visible"
@@ -237,6 +248,17 @@ function Home() {
               </Row>
             </AnimatePresence>
           </Slider>
+          <div>
+            <button onClick={decreaseIndex} style={{ position: "absolute" }}>
+              prev
+            </button>
+            <button
+              onClick={incraseIndex}
+              style={{ position: "absolute", right: 0 }}
+            >
+              next
+            </button>
+          </div>
           <AnimatePresence>
             {bigMovieMatch ? (
               <>
