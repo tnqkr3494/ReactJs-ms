@@ -1,117 +1,96 @@
 import { DragDropContext, DropResult, Droppable } from "react-beautiful-dnd";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
 import styled from "styled-components";
-import { toDoIndex, toDoState } from "./atoms";
+import { IToDoState, toDoState } from "./atoms";
 import Board from "./components/Board";
-import { useForm } from "react-hook-form";
 import { useState } from "react";
 
 const Wrapper = styled.div`
-  padding: 10px;
   display: flex;
+  width: 100vw;
+  margin: 0 auto;
   justify-content: center;
+  align-items: center;
+  height: 100vh;
 `;
 
 const Boards = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
   gap: 10px;
 `;
 
-interface IForm {
-  Title: string;
-}
-
 function App() {
   const [toDos, setToDos] = useRecoilState(toDoState);
-  const [visible, setVisible] = useState(false);
-  const { register, handleSubmit, setValue } = useForm<IForm>();
-  const [Index, setIndex] = useRecoilState(toDoIndex);
   const onDragEnd = (info: DropResult) => {
-    const { destination, source } = info;
+    const { destination, source, type } = info;
+    console.log(info);
     if (!destination) return;
-    //same board
-    if (destination?.droppableId === source.droppableId) {
-      setToDos((oldBoards) => {
-        const copyBoard = [...oldBoards[source.droppableId]];
-        const taskObj = copyBoard[source.index];
-        copyBoard.splice(source.index, 1);
-        copyBoard.splice(destination?.index, 0, taskObj);
-        return {
-          ...oldBoards,
-          [destination.droppableId]: copyBoard,
-        };
+    if (type === "card") {
+      if (destination?.droppableId === source.droppableId) {
+        // same board movement.
+        setToDos((allBoards) => {
+          const boardCopy = [...allBoards[source.droppableId]];
+          const taskObj = boardCopy[source.index];
+          boardCopy.splice(source.index, 1);
+          boardCopy.splice(destination?.index, 0, taskObj);
+          return {
+            ...allBoards,
+            [source.droppableId]: boardCopy,
+          };
+        });
+      }
+      if (destination.droppableId !== source.droppableId) {
+        // cross board movement
+        setToDos((allBoards) => {
+          const sourceBoard = [...allBoards[source.droppableId]];
+          const taskObj = sourceBoard[source.index];
+          const destinationBoard = [...allBoards[destination.droppableId]];
+          sourceBoard.splice(source.index, 1);
+          destinationBoard.splice(destination?.index, 0, taskObj);
+          return {
+            ...allBoards,
+            [source.droppableId]: sourceBoard,
+            [destination.droppableId]: destinationBoard,
+          };
+        });
+      }
+    } else {
+      setToDos((oldToDos) => {
+        const boardOrder = [...Object.keys(oldToDos)];
+        const [removed] = boardOrder.splice(source.index, 1);
+        boardOrder.splice(destination.index, 0, removed);
+
+        const newToDos: IToDoState = {};
+        boardOrder.forEach((boardId) => {
+          newToDos[boardId] = oldToDos[boardId];
+        });
+
+        return newToDos;
       });
     }
-    //different board
-    if (destination?.droppableId !== source.droppableId) {
-      setToDos((oldBoards) => {
-        const sourceBoard = [...oldBoards[source.droppableId]];
-        const destinationBoard = [...oldBoards[destination.droppableId]];
-        const taskObj = sourceBoard[source.index];
-        sourceBoard.splice(source.index, 1);
-        destinationBoard.splice(destination.index, 0, taskObj);
-        return {
-          ...oldBoards,
-          [source.droppableId]: sourceBoard,
-          [destination.droppableId]: destinationBoard,
-        };
-      });
-    }
   };
-  const onClick = () => {
-    setVisible((prev) => !prev);
-  };
-
-  const onValid = ({ Title }: IForm) => {
-    setToDos((oldToDos) => {
-      return {
-        ...oldToDos,
-        [Title]: [],
-      };
-    });
-    setValue("Title", "");
-    setVisible((prev) => !prev);
-    setIndex((prevOrder) => [...prevOrder, Title]);
-  };
-
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Wrapper>
-        <Boards>
-          {Index.map((boardId, index) => (
-            <Droppable droppableId={boardId} type="board">
-              {(magic) => (
-                <div ref={magic.innerRef} {...magic.droppableProps}>
-                  <Board
-                    key={boardId}
-                    toDos={toDos[boardId]}
-                    boardId={boardId}
-                    index={index}
-                  />
-                  {magic.placeholder}
-                </div>
-              )}
-            </Droppable>
-          ))}
-          <button
-            style={
-              visible
-                ? { display: "none", width: "300px", height: "300px" }
-                : { display: "block", width: "300px", height: "300px" }
-            }
-            onClick={onClick}
-          >
-            Add Board
-          </button>
-          <form onSubmit={handleSubmit(onValid)}>
-            <input
-              style={visible ? { display: "block" } : { display: "none" }}
-              placeholder="Title"
-              {...register("Title", { required: true })}
-            />
-          </form>
-        </Boards>
+        <Droppable droppableId="board" type="board" direction="horizontal">
+          {(magic) => (
+            <Boards ref={magic.innerRef} {...magic.droppableProps}>
+              {Object.keys(toDos).map((boardId, index) => (
+                <Board
+                  boardId={boardId}
+                  key={boardId}
+                  toDos={toDos[boardId]}
+                  index={index}
+                />
+              ))}
+              {magic.placeholder}
+            </Boards>
+          )}
+        </Droppable>
       </Wrapper>
     </DragDropContext>
   );

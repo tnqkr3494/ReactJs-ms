@@ -1,12 +1,18 @@
 import { atom } from "recoil";
+import { recoilPersist } from "recoil-persist";
 
-export interface IToDo {
+const { persistAtom } = recoilPersist({
+  key: "recoil-persist", // 고유한 키 값을 지정합니다.
+  storage: localStorage, // 사용할 스토리지 종류를 선택합니다 (localStorage, sessionStorage 등).
+});
+
+export interface ITodo {
   id: number;
   text: string;
 }
 
-interface IToDoState {
-  [key: string]: IToDo[];
+export interface IToDoState {
+  [key: string]: ITodo[];
 }
 
 export const toDoState = atom<IToDoState>({
@@ -16,9 +22,5 @@ export const toDoState = atom<IToDoState>({
     Doing: [],
     Done: [],
   },
-});
-
-export const toDoIndex = atom<string[]>({
-  key: "Index",
-  default: ["To Do", "Doing", "Done"],
+  effects_UNSTABLE: [persistAtom],
 });

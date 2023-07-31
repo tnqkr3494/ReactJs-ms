@@ -1,54 +1,64 @@
-import { styled } from "styled-components";
-import DraggableCard from "./DraggableCard";
-import { IToDo, toDoIndex, toDoState } from "../atoms";
-import { Draggable, Droppable } from "react-beautiful-dnd";
 import { useForm } from "react-hook-form";
+import { Draggable, Droppable } from "react-beautiful-dnd";
+import styled from "styled-components";
+import DragabbleCard from "./DragabbleCard";
+import { ITodo, toDoState } from "../atoms";
 import { useSetRecoilState } from "recoil";
 
 const Wrapper = styled.div`
-  background-color: #fff;
   width: 300px;
+  padding-top: 10px;
+  background-color: ${(props) => props.theme.boardColor};
+  border-radius: 5px;
   min-height: 300px;
   display: flex;
-  text-align: center;
   flex-direction: column;
+  overflow: hidden;
 `;
 
 const Title = styled.h2`
-  position: relative;
+  text-align: center;
   font-weight: 600;
+  margin-bottom: 10px;
   font-size: 18px;
-  padding: 10px;
 `;
 
-const Xbutton = styled.button`
-  position: absolute;
-  right: 10px;
-  border: none;
-  background-color: white;
-  cursor: pointer;
-`;
+interface IAreaProps {
+  isDraggingFromThis: boolean;
+  isDraggingOver: boolean;
+}
 
-const Area = styled.div`
-  background-color: #bbb;
+const Area = styled.div<IAreaProps>`
+  background-color: ${(props) =>
+    props.isDraggingOver
+      ? "#dfe6e9"
+      : props.isDraggingFromThis
+      ? "#b2bec3"
+      : "transparent"};
   flex-grow: 1;
+  transition: background-color 0.3s ease-in-out;
   padding: 20px;
 `;
 
 const Form = styled.form`
   width: 100%;
-  padding-bottom: 5px;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 10px;
   input {
+    font-size: 16px;
+    border: 0;
+    background-color: white;
     width: 80%;
     padding: 10px;
-    text-align: center;
     border-radius: 5px;
-    background-color: white;
+    text-align: center;
+    margin: 0 auto;
   }
 `;
 
-interface IBoard {
-  toDos: IToDo[];
+interface IBoardProps {
+  toDos: ITodo[];
   boardId: string;
   index: number;
 }
@@ -57,26 +67,21 @@ interface IForm {
   toDo: string;
 }
 
-function Board({ toDos, boardId, index }: IBoard) {
-  const { register, handleSubmit, setValue } = useForm<IForm>();
-  const setIndex = useSetRecoilState(toDoIndex);
+function Board({ toDos, boardId, index }: IBoardProps) {
   const setToDos = useSetRecoilState(toDoState);
+  const { register, setValue, handleSubmit } = useForm<IForm>();
   const onValid = ({ toDo }: IForm) => {
-    setToDos((oldToDos) => {
-      const newToDo = { id: Date.now(), text: toDo };
+    const newToDo = {
+      id: Date.now(),
+      text: toDo,
+    };
+    setToDos((allBoards) => {
       return {
-        ...oldToDos,
-        [boardId]: [...oldToDos[boardId], newToDo],
+        ...allBoards,
+        [boardId]: [newToDo, ...allBoards[boardId]],
       };
     });
     setValue("toDo", "");
-  };
-  const deleteBoard = () => {
-    setToDos((oldToDos) => {
-      const { [boardId]: _, ...newBoard } = oldToDos;
-      return { ...newBoard };
-    });
-    setIndex((prevOrder) => prevOrder.filter((board) => board !== boardId));
   };
   return (
     <Draggable draggableId={boardId} index={index}>
@@ -86,21 +91,24 @@ function Board({ toDos, boardId, index }: IBoard) {
           {...magic.draggableProps}
           {...magic.dragHandleProps}
         >
-          <Title>
-            {boardId}
-            <Xbutton onClick={deleteBoard}>X</Xbutton>
-          </Title>
+          <Title>{boardId}</Title>
           <Form onSubmit={handleSubmit(onValid)}>
             <input
-              placeholder="Write To Do"
               {...register("toDo", { required: true })}
+              type="text"
+              placeholder={`Add task on ${boardId}`}
             />
           </Form>
           <Droppable droppableId={boardId} type="card">
-            {(magic) => (
-              <Area ref={magic.innerRef} {...magic.droppableProps}>
+            {(magic, info) => (
+              <Area
+                isDraggingOver={info.isDraggingOver}
+                isDraggingFromThis={Boolean(info.draggingFromThisWith)}
+                ref={magic.innerRef}
+                {...magic.droppableProps}
+              >
                 {toDos.map((toDo, index) => (
-                  <DraggableCard
+                  <DragabbleCard
                     key={toDo.id}
                     index={index}
                     toDoId={toDo.id}
@@ -116,5 +124,4 @@ function Board({ toDos, boardId, index }: IBoard) {
     </Draggable>
   );
 }
-
 export default Board;
