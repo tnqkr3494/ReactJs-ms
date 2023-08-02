@@ -32,12 +32,12 @@ const Banner = styled.div<{ bgPhoto: string }>`
 
 const Title = styled.h2`
   font-size: 68px;
-  font-weight: 400;
+  font-weight: 300;
 `;
 
 const OverView = styled.p`
-  max-width: 600px;
-  font-size: 24px;
+  max-width: 500px;
+  font-size: 20px;
 `;
 
 const Slider = styled.div`
@@ -53,11 +53,14 @@ const Row = styled(motion.div)`
   width: 100%;
 `;
 
-const Box = styled(motion.div)`
+const Box = styled(motion.div)<{ bgPhoto: string }>`
   background-color: white;
   height: 200px;
   color: red;
   font-size: 66px;
+  background-image: url(${(props) => props.bgPhoto});
+  background-position: center;
+  background-size: cover;
 `;
 
 const rowVariants = {
@@ -72,11 +75,14 @@ const rowVariants = {
   },
 };
 
+const offset = 6;
+
 function Home() {
   const { data, isLoading } = useQuery<IGetMoviesResult>(
     ["movies", "nowPlaying"],
     getMovies
   );
+  console.log(data);
 
   const [index, setIndex] = useState(0);
 
@@ -85,9 +91,13 @@ function Home() {
   const toggleLeaving = () => setLeaving((prev) => !prev);
 
   const nextSlide = () => {
-    if (leaving) return;
-    toggleLeaving();
-    setIndex((prev) => prev + 1);
+    if (data) {
+      if (leaving) return;
+      toggleLeaving();
+      const totalMovies = data.results.length - 1;
+      const maxIndex = Math.floor(totalMovies / offset) - 1;
+      setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
+    }
   };
 
   return (
@@ -115,9 +125,15 @@ function Home() {
                 exit="exit"
                 transition={{ type: "tween", duration: 1 }}
               >
-                {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <Box key={i}>{i}</Box>
-                ))}
+                {data?.results
+                  .slice(1)
+                  .slice(index * offset, index * offset + offset)
+                  .map((movie) => (
+                    <Box
+                      key={movie.id}
+                      bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
+                    ></Box>
+                  ))}
               </Row>
             </AnimatePresence>
           </Slider>
