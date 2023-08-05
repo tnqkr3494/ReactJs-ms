@@ -7,6 +7,9 @@ import {
   IGetMoviesResult,
   getMovies,
   getMoviesDetail,
+  popularMovies,
+  topMovies,
+  upComingMovies,
 } from "../api";
 import { useEffect, useState } from "react";
 import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
@@ -71,8 +74,12 @@ function Home() {
             <Title>{movie?.results[0].title}</Title>
             <OverView>{movie?.results[0].overview}</OverView>
           </Banner>
-          <Slider />
-          {isOverlay ? <Overlay /> : null}
+          <Slider fun={getMovies} title={"현재상영중인 영화"} />
+          <Slider fun={popularMovies} title={"인기있는 영화"} />
+          <Slider fun={topMovies} title={"평점좋은 영화"} />
+          <Slider fun={upComingMovies} title={"개봉예정인 영화"} />
+
+          <AnimatePresence>{isOverlay ? <Overlay /> : null}</AnimatePresence>
         </>
       )}
     </Wrapper>

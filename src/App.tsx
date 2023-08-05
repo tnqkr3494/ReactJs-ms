@@ -5,6 +5,7 @@ import Header from "./components/Header";
 import Tv from "./Routes/Tv";
 import Search from "./Routes/Search";
 import Home from "./Routes/Home";
+import Detail from "./Routes/Detail";
 
 function App() {
   return (
@@ -16,6 +17,9 @@ function App() {
         </Route>
         <Route path="/search">
           <Search />
+        </Route>
+        <Route path="/detail/:kind">
+          <Detail />
         </Route>
         <Route path={["/", "/movies/:movieId"]}>
           <Home />

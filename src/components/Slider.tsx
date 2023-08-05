@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { useQuery } from "react-query";
 import { styled } from "styled-components";
-import { IGetMoviesResult, getMovies } from "../api";
+import { IGetMoviesResult } from "../api";
 import { useHistory } from "react-router-dom";
 import { makeImagePath } from "../util";
 
@@ -113,16 +113,13 @@ const rowVariants = {
 
 const offset = 6;
 
-function Slider() {
+function Slider({ fun, title }: any) {
   const history = useHistory();
   const [isBack, setIsBack] = useState(false);
   const [index, setIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
   const toggleLeaving = () => setLeaving((prev) => !prev);
-  const { data: movie, isLoading } = useQuery<IGetMoviesResult>(
-    ["movies", "nowPlaying"],
-    getMovies
-  );
+  const { data: movie } = useQuery<IGetMoviesResult>(["movies", title], fun);
 
   const nextSlide = () => {
     if (movie) {
@@ -151,7 +148,7 @@ function Slider() {
   };
   return (
     <Wrapper>
-      <SlderTitle>Now Playing</SlderTitle>
+      <SlderTitle>{title}</SlderTitle>
       <AnimatePresence
         initial={false}
         onExitComplete={toggleLeaving}
