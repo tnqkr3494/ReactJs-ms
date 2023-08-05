@@ -7,9 +7,7 @@ import {
   useAnimation,
   AnimatePresence,
 } from "framer-motion";
-import { Link, useHistory, useRouteMatch } from "react-router-dom";
-import { getMovies } from "../api";
-import { useRecoilState } from "recoil";
+import { Link, useRouteMatch } from "react-router-dom";
 
 const Nav = styled(motion.nav)`
   width: 100%;

@@ -45,7 +45,8 @@ const Box = styled(motion.div)<{ bgPhoto: string }>`
   height: 200px;
   color: red;
   font-size: 66px;
-  background-image: url(${(props) => props.bgPhoto});
+  background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)),
+    url(${(props) => props.bgPhoto});
   background-position: center;
   background-size: cover;
   &:first-child {
@@ -55,6 +56,11 @@ const Box = styled(motion.div)<{ bgPhoto: string }>`
     transform-origin: center right;
   }
   cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  border-radius: 10px;
 `;
 
 const Info = styled(motion.div)`
@@ -63,14 +69,30 @@ const Info = styled(motion.div)`
   padding: 10px;
   width: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   position: absolute;
   bottom: 0;
-  font-size: 18px;
+  font-size: 14px;
+  font-weight: 500;
   color: white;
   text-align: center;
 `;
+
+const Title = styled.div`
+  font-size: 16px;
+  font-weight: 500;
+  color: white;
+  max-width: 200px;
+`;
+
+const Vote = styled.div`
+  font-size: 25px;
+  color: ${(prop) => prop.theme.red};
+`;
+
+const Release = styled.div``;
 
 const boxVariants = {
   normal: {
@@ -177,8 +199,10 @@ function Slider({ fun, title }: any) {
                 transition={{ type: "tween" }}
                 onClick={() => onBoxClicked(movie.id)}
               >
+                <Title>{movie.title}</Title>
                 <Info variants={infoVariants}>
-                  <h4>{movie.title}</h4>
+                  <Vote>★ {movie.vote_average.toFixed(1)}</Vote>
+                  <Release>개봉일: {movie.release_date}</Release>
                 </Info>
               </Box>
             ))}

@@ -124,8 +124,6 @@ function Overlay() {
     movieCrews(+bigMovieMatch?.params.movieId!)
   );
 
-  console.log(crew);
-
   const producer = crew?.crew.find((member) => member.job === "Producer");
 
   return (
