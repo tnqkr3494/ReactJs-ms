@@ -81,14 +81,14 @@ const Info = styled(motion.div)`
 `;
 
 const Title = styled.div`
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   color: white;
   max-width: 200px;
 `;
 
 const Vote = styled.div`
-  font-size: 25px;
+  font-size: 18px;
   color: ${(prop) => prop.theme.red};
 `;
 

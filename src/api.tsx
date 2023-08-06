@@ -10,6 +10,8 @@ interface IMovie {
   original_title: string;
   release_date: string;
   vote_average: number;
+  adult: boolean;
+  popularity: number;
 }
 
 export interface IGetMoviesResult {
@@ -29,11 +31,14 @@ interface IGenres {
 
 export interface IDetailResult {
   backdrop_path: string;
+  poster_path: string;
   overview: string;
   release_date: string;
   vote_average: number;
   tagline: string;
   title: string;
+  adult: boolean;
+  popularity: number;
   genres: IGenres[];
 }
 

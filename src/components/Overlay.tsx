@@ -29,7 +29,7 @@ const Wrapper = styled(motion.div)`
 
 const BigMovie = styled(motion.div)`
   position: absolute;
-  width: 50vw;
+  width: 70vw;
   height: 80vh;
   background-color: ${(props) => props.theme.black.lighter};
   border-radius: 15px;
@@ -42,7 +42,7 @@ const MovieBg = styled.div<{ bgPhoto: string }>`
   background-size: cover;
   background-position: center top;
   width: 100%;
-  height: 300px;
+  height: 400px;
   display: flex;
   flex-direction: column;
   text-align: center;
@@ -60,12 +60,25 @@ const MovieDetail = styled.div`
   padding: 20px;
 `;
 
+const Info = styled.div``;
+
+const Poster = styled.img`
+  height: 350px;
+  float: left;
+  position: relative;
+  top: -100px;
+  margin-right: 10px;
+`;
+
 const Vote = styled.div`
   font-size: 25px;
+  font-weight: 600;
   color: ${(prop) => prop.theme.red};
 `;
 
-const Release = styled.div``;
+const Release = styled.div`
+  font-weight: 600;
+`;
 
 const Genre = styled.div`
   margin-top: 20px;
@@ -108,6 +121,19 @@ const Img = styled.div<{ bgPhoto: string }>`
   margin: 10px 0px;
 `;
 
+const NoImg = styled.div`
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin: 10px 0px;
+  background-color: grey;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 500;
+  font-size: 20px;
+`;
+
 function Overlay() {
   const history = useHistory();
   const bigMovieMatch = useRouteMatch<{ movieId: string }>("/movies/:movieId");
@@ -144,29 +170,30 @@ function Overlay() {
               <MovieTitle>{detail?.title}</MovieTitle>
               <span>{detail?.tagline}</span>
               <Genre>
+                <span style={{ backgroundColor: "black" }}>
+                  {detail?.adult ? "🔞" : "청소년관람가능"}
+                </span>
                 {detail?.genres.map((genre, index) => {
                   return <span key={index}>{genre.name}</span>;
                 })}
               </Genre>
             </MovieBg>
             <MovieDetail>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Release>개봉일 : {detail?.release_date}</Release>
-                <Vote>평점 : {detail?.vote_average.toFixed(1)}</Vote>
-              </div>
-
-              <div>{detail?.overview}</div>
+              <Poster src={makeImagePath(detail?.poster_path!)}></Poster>
+              <Info>
+                <Release>개봉일: {detail?.release_date} </Release>
+                <Vote>★ {detail?.vote_average.toFixed(1)}</Vote>
+                <div>{detail?.overview}</div>
+              </Info>
             </MovieDetail>
             <MovieCrews>
               <Member>
                 <Job>Producer</Job>
-                <Img bgPhoto={makeImagePath(producer?.profile_path!)} />
+                {producer?.profile_path ? (
+                  <Img bgPhoto={makeImagePath(producer?.profile_path!)} />
+                ) : (
+                  <NoImg>No Img</NoImg>
+                )}
                 <span>{producer?.name}</span>
               </Member>
               <div style={{ display: "flex" }}>
@@ -174,7 +201,11 @@ function Overlay() {
                   return (
                     <Member key={index}>
                       <Job>Actor</Job>
-                      <Img bgPhoto={makeImagePath(member.profile_path)} />
+                      {member.profile_path ? (
+                        <Img bgPhoto={makeImagePath(member.profile_path)} />
+                      ) : (
+                        <NoImg>No Img</NoImg>
+                      )}
                       <span>{member.name}</span>
                     </Member>
                   );
