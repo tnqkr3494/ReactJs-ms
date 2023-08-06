@@ -54,6 +54,10 @@ export interface ICrew {
   crew: ICrews[];
 }
 
+export interface ISearchMovies {
+  results: IMovie[];
+}
+
 export function getMovies() {
   return fetch(
     `${BASE_PATH}/movie/now_playing?api_key=${API_KEY}&language=ko`
@@ -87,5 +91,11 @@ export function upComingMovies() {
 export function movieCrews(id: number) {
   return fetch(
     `${BASE_PATH}/movie/${id}/credits?api_key=${API_KEY}&language=ko`
+  ).then((response) => response.json());
+}
+
+export function searchMovies(query: string) {
+  return fetch(
+    `${BASE_PATH}/search/movie?query=${query}&api_key=${API_KEY}&language=ko`
   ).then((response) => response.json());
 }
