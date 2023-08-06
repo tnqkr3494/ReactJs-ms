@@ -66,7 +66,7 @@ const Poster = styled.img`
   height: 350px;
   float: left;
   position: relative;
-  top: -100px;
+  top: -80px;
   margin-right: 10px;
 `;
 
@@ -153,8 +153,6 @@ function TvO({ keyword }: ITvO) {
   const { data: crew } = useQuery<ICrew>(["tv", "crew"], () =>
     tvCrews(+bigMovieMatch?.params.Id!)
   );
-
-  console.log(detail);
 
   const producer = crew?.crew.find(
     (member) => member.department === "Directing" || "Writing"

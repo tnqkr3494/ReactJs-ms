@@ -23,8 +23,8 @@ const Wrapper = styled(motion.div)`
   background-color: rgba(0, 0, 0, 0.5);
   opacity: 0;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 `;
 
 const BigMovie = styled(motion.div)`
@@ -66,7 +66,7 @@ const Poster = styled.img`
   height: 350px;
   float: left;
   position: relative;
-  top: -100px;
+  top: -80px;
   margin-right: 10px;
 `;
 

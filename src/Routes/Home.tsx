@@ -9,8 +9,7 @@ import {
   topMovies,
   upComingMovies,
 } from "../api";
-import { useEffect, useState } from "react";
-import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
+import { useRouteMatch } from "react-router-dom";
 import Slider from "../components/Slider";
 import Overlay from "../components/Overlay";
 

@@ -20,10 +20,19 @@ const NoResult = styled.div`
 `;
 
 const Wrapper = styled.div`
-  margin: 150px 60px 0px 90px;
+  margin-top: 150px;
+`;
+
+const SearchInfo = styled.h2`
+  font-size: 25px;
+  font-weight: 500;
+  padding: 20px;
+  margin-top: 20px;
 `;
 
 const Grid = styled.div`
+  padding: 20px;
+  margin-bottom: 20px;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 50px 10px;
@@ -142,7 +151,7 @@ function Search() {
 
   return (
     <Wrapper>
-      <h2>영화 {keyword} 검색결과</h2>
+      <SearchInfo>영화 "{keyword}" 검색결과</SearchInfo>
       {searchM?.results.length === 0 ? (
         <NoResult>No Result...</NoResult>
       ) : (
@@ -164,12 +173,13 @@ function Search() {
               </Info>
             </Box>
           ))}
-          <AnimatePresence>
-            {isMovie ? <MovieO keyword={keyword!} /> : null}
-          </AnimatePresence>
         </Grid>
       )}
-      <h2>TV {keyword} 검색결과</h2>
+      <AnimatePresence>
+        {isMovie ? <MovieO keyword={keyword!} /> : null}
+      </AnimatePresence>
+      <hr style={{ margin: "0 20px" }} />
+      <SearchInfo>TV "{keyword}" 검색결과</SearchInfo>
       {searchT?.results.length === 0 ? (
         <NoResult>No Result...</NoResult>
       ) : (
@@ -191,11 +201,11 @@ function Search() {
               </Info>
             </Box>
           ))}
-          <AnimatePresence>
-            {isTv ? <TvO keyword={keyword!} /> : null}
-          </AnimatePresence>
         </Grid>
       )}
+      <AnimatePresence>
+        {isTv ? <TvO keyword={keyword!} /> : null}
+      </AnimatePresence>
     </Wrapper>
   );
 }

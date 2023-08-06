@@ -22,12 +22,14 @@ const SliderBtn = styled(motion.div)`
   position: absolute;
   top: 120px;
   background-color: ${(props) => props.theme.black.lighter};
-  width: 40px;
-  height: 40px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
   opacity: 0.7;
+  font-size: 25px;
   cursor: pointer;
 `;
 
@@ -208,9 +210,9 @@ function Slider({ fun, title }: any) {
             ))}
         </Row>
       </AnimatePresence>
-      <SliderBtn onClick={prevSlide}>1</SliderBtn>
+      <SliderBtn onClick={prevSlide}>◀️</SliderBtn>
       <SliderBtn style={{ right: 0 }} onClick={nextSlide}>
-        2
+        ▶️
       </SliderBtn>
     </Wrapper>
   );
