@@ -29,7 +29,7 @@ interface IGenres {
   name: string;
 }
 
-export interface IDetailResult {
+export interface IMovieDetail {
   backdrop_path: string;
   poster_path: string;
   overview: string;
@@ -42,16 +42,34 @@ export interface IDetailResult {
   genres: IGenres[];
 }
 
+interface ISeasons {
+  episode_count: number;
+}
+
+export interface ITvDetail {
+  backdrop_path: string;
+  genres: IGenres[];
+  name: string;
+  overview: string;
+  poster_path: string;
+  tagline: string;
+  vote_average: number;
+  first_air_date: string;
+  seasons: ISeasons[];
+}
+
 interface ICast {
   name: string;
   profile_path: string;
   job: string;
+  department: string;
 }
 
 interface ICrews {
   name: string;
   profile_path: string;
   job: string;
+  department: string;
 }
 
 export interface ICrew {
@@ -63,6 +81,20 @@ export interface ISearchMovies {
   results: IMovie[];
 }
 
+interface ITv {
+  backdrop_path: string;
+  overview: string;
+  poster_path: string;
+  first_air_date: string;
+  name: string;
+  vote_average: number;
+  id: number;
+}
+
+export interface ISearchTv {
+  results: ITv[];
+}
+
 export function getMovies() {
   return fetch(
     `${BASE_PATH}/movie/now_playing?api_key=${API_KEY}&language=ko`
@@ -71,6 +103,12 @@ export function getMovies() {
 
 export function getMoviesDetail(id: number) {
   return fetch(`${BASE_PATH}/movie/${id}?api_key=${API_KEY}&language=ko`).then(
+    (reponse) => reponse.json()
+  );
+}
+
+export function getTvDetail(id: number) {
+  return fetch(`${BASE_PATH}/tv/${id}?api_key=${API_KEY}&language=ko`).then(
     (reponse) => reponse.json()
   );
 }
@@ -99,8 +137,20 @@ export function movieCrews(id: number) {
   ).then((response) => response.json());
 }
 
+export function tvCrews(id: number) {
+  return fetch(
+    `${BASE_PATH}/tv/${id}/credits?api_key=${API_KEY}&language=ko`
+  ).then((response) => response.json());
+}
+
 export function searchMovies(query: string) {
   return fetch(
     `${BASE_PATH}/search/movie?query=${query}&api_key=${API_KEY}&language=ko`
+  ).then((response) => response.json());
+}
+
+export function searchTv(query: string) {
+  return fetch(
+    `${BASE_PATH}/search/tv?query=${query}&api_key=${API_KEY}&language=ko`
   ).then((response) => response.json());
 }

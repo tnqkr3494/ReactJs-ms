@@ -1,20 +1,22 @@
 import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
 import { useQuery } from "react-query";
-import { ISearchMovies, searchMovies } from "../api";
+import { ISearchMovies, ISearchTv, searchMovies, searchTv } from "../api";
 import { makeImagePath } from "../util";
 import { styled } from "styled-components";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import SearchO from "../components/SearchO";
+import SearchO from "../components/MovieO";
+import MovieO from "../components/MovieO";
+import TvO from "../components/TvO";
 
-const Loading = styled.div`
-  height: 100vh;
+const NoResult = styled.div`
   display: flex;
-  justify-content: center;
   align-items: center;
-  font-size: 50px;
+  justify-content: center;
+  text-align: center;
+  font-size: 68px;
   font-weight: 600;
-  background-color: black;
+  padding: 100px;
 `;
 
 const Wrapper = styled.div`
@@ -109,31 +111,43 @@ const infoVariants = {
 };
 
 function Search() {
-  const isOverlay = useRouteMatch("/search/movie/:Id");
+  const isMovie = useRouteMatch("/search/movie/:Id");
+  const isTv = useRouteMatch("/search/tv/:Id");
   const history = useHistory();
   const location = useLocation();
   const keyword = new URLSearchParams(location.search).get("keyword");
 
-  const { data, isLoading, refetch } = useQuery<ISearchMovies>(
+  const { data: searchM, refetch: refetchM } = useQuery<ISearchMovies>(
     ["movie", "search"],
     () => searchMovies(keyword!)
   );
+
+  const { data: searchT, refetch: refetchT } = useQuery<ISearchTv>(
+    ["tv", "search"],
+    () => searchTv(keyword!)
+  );
+
   useEffect(() => {
-    refetch();
+    refetchM();
+    refetchT();
   }, [keyword]);
 
   const onBoxClicked = (id: number) => {
     history.push(`/search/movie/${id}?keyword=${keyword}`);
   };
 
+  const onBoxClicked2 = (id: number) => {
+    history.push(`/search/tv/${id}?keyword=${keyword}`);
+  };
+
   return (
     <Wrapper>
       <h2>영화 {keyword} 검색결과</h2>
-      {isLoading ? (
-        <Loading>Loading...</Loading>
+      {searchM?.results.length === 0 ? (
+        <NoResult>No Result...</NoResult>
       ) : (
         <Grid>
-          {data?.results.map((movie) => (
+          {searchM?.results.map((movie) => (
             <Box
               key={movie.id}
               bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
@@ -151,7 +165,34 @@ function Search() {
             </Box>
           ))}
           <AnimatePresence>
-            {isOverlay ? <SearchO query="movie" keyword={keyword!} /> : null}
+            {isMovie ? <MovieO keyword={keyword!} /> : null}
+          </AnimatePresence>
+        </Grid>
+      )}
+      <h2>TV {keyword} 검색결과</h2>
+      {searchT?.results.length === 0 ? (
+        <NoResult>No Result...</NoResult>
+      ) : (
+        <Grid>
+          {searchT?.results.map((Tv) => (
+            <Box
+              key={Tv.id}
+              bgPhoto={makeImagePath(Tv.backdrop_path, "w500")}
+              variants={boxVariants}
+              initial="normal"
+              whileHover="hover"
+              transition={{ type: "tween" }}
+              onClick={() => onBoxClicked2(Tv.id)}
+            >
+              <Title>{Tv.name}</Title>
+              <Info variants={infoVariants}>
+                <Vote>★ {Tv.vote_average.toFixed(1)}</Vote>
+                <Release>시즌시작: {Tv.first_air_date}</Release>
+              </Info>
+            </Box>
+          ))}
+          <AnimatePresence>
+            {isTv ? <TvO keyword={keyword!} /> : null}
           </AnimatePresence>
         </Grid>
       )}

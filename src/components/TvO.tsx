@@ -3,7 +3,7 @@ import { useHistory, useRouteMatch } from "react-router-dom";
 import { styled } from "styled-components";
 import { makeImagePath } from "../util";
 import { useQuery } from "react-query";
-import { ICrew, IDetailResult, getMoviesDetail, movieCrews } from "../api";
+import { ICrew, ITvDetail, getTvDetail, tvCrews } from "../api";
 
 const Loading = styled.div`
   height: 100vh;
@@ -134,30 +134,31 @@ const NoImg = styled.div`
   font-size: 20px;
 `;
 
-interface ISearchO {
-  query: string;
+interface ITvO {
   keyword: string;
 }
 
-function SearchO({ query, keyword }: ISearchO) {
+function TvO({ keyword }: ITvO) {
   const history = useHistory();
-  const bigMovieMatch = useRouteMatch<{ Id: string }>(`/search/${query}/:Id`);
+  const bigMovieMatch = useRouteMatch<{ Id: string }>(`/search/tv/:Id`);
   const onOverlayClicked = () => {
     history.push(`/search?keyword=${keyword}`);
   };
 
-  const { data: detail, isLoading } = useQuery<IDetailResult>(
-    ["movie", "detail"],
-    () => getMoviesDetail(+bigMovieMatch?.params.Id!)
+  const { data: detail, isLoading } = useQuery<ITvDetail>(
+    ["tv", "detail"],
+    () => getTvDetail(+bigMovieMatch?.params.Id!)
+  );
+
+  const { data: crew } = useQuery<ICrew>(["tv", "crew"], () =>
+    tvCrews(+bigMovieMatch?.params.Id!)
   );
 
   console.log(detail);
 
-  const { data: crew } = useQuery<ICrew>(["movie", "crew"], () =>
-    movieCrews(+bigMovieMatch?.params.Id!)
+  const producer = crew?.crew.find(
+    (member) => member.department === "Directing" || "Writing"
   );
-
-  const producer = crew?.crew.find((member) => member.job === "Producer");
 
   return (
     <>
@@ -174,7 +175,7 @@ function SearchO({ query, keyword }: ISearchO) {
         >
           <BigMovie>
             <MovieBg bgPhoto={makeImagePath(detail?.backdrop_path!)}>
-              <MovieTitle>{detail?.title}</MovieTitle>
+              <MovieTitle>{detail?.name}</MovieTitle>
               <span>{detail?.tagline}</span>
               <Genre>
                 {detail?.genres.map((genre, index) => {
@@ -185,7 +186,7 @@ function SearchO({ query, keyword }: ISearchO) {
             <MovieDetail>
               <Poster src={makeImagePath(detail?.poster_path!)}></Poster>
               <Info>
-                <Release>개봉일: {detail?.release_date} </Release>
+                <Release>시즌시작: {detail?.first_air_date} </Release>
                 <Vote>★ {detail?.vote_average.toFixed(1)}</Vote>
                 <div>{detail?.overview}</div>
               </Info>
@@ -223,4 +224,4 @@ function SearchO({ query, keyword }: ISearchO) {
   );
 }
 
-export default SearchO;
+export default TvO;

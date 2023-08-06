@@ -134,11 +134,15 @@ const NoImg = styled.div`
   font-size: 20px;
 `;
 
-function Overlay() {
+interface IMovieO {
+  keyword: string;
+}
+
+function MovieO({ keyword }: IMovieO) {
   const history = useHistory();
-  const bigMovieMatch = useRouteMatch<{ Id: string }>(`/movies/:Id`);
+  const bigMovieMatch = useRouteMatch<{ Id: string }>(`/search/movie/:Id`);
   const onOverlayClicked = () => {
-    history.push("/");
+    history.push(`/search?keyword=${keyword}`);
   };
 
   const { data: detail, isLoading } = useQuery<IMovieDetail>(
@@ -216,4 +220,4 @@ function Overlay() {
   );
 }
 
-export default Overlay;
+export default MovieO;

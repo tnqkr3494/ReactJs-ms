@@ -3,10 +3,8 @@ import { makeImagePath } from "../util";
 import { useQuery } from "react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  IDetailResult,
   IGetMoviesResult,
   getMovies,
-  getMoviesDetail,
   popularMovies,
   topMovies,
   upComingMovies,
