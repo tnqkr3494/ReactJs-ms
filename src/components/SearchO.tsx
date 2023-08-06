@@ -134,17 +134,24 @@ const NoImg = styled.div`
   font-size: 20px;
 `;
 
-function Overlay() {
+interface ISearchO {
+  query: string;
+  keyword: string;
+}
+
+function SearchO({ query, keyword }: ISearchO) {
   const history = useHistory();
-  const bigMovieMatch = useRouteMatch<{ Id: string }>(`/movies/:Id`);
+  const bigMovieMatch = useRouteMatch<{ Id: string }>(`/search/${query}/:Id`);
   const onOverlayClicked = () => {
-    history.push("/");
+    history.push(`/search?keyword=${keyword}`);
   };
 
   const { data: detail, isLoading } = useQuery<IDetailResult>(
     ["movie", "detail"],
     () => getMoviesDetail(+bigMovieMatch?.params.Id!)
   );
+
+  console.log(detail);
 
   const { data: crew } = useQuery<ICrew>(["movie", "crew"], () =>
     movieCrews(+bigMovieMatch?.params.Id!)
@@ -216,4 +223,4 @@ function Overlay() {
   );
 }
 
-export default Overlay;
+export default SearchO;
