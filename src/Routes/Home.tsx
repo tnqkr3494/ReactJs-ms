@@ -71,11 +71,15 @@ function Home() {
             <Title>{movie?.results[0].title}</Title>
             <OverView>{movie?.results[0].overview}</OverView>
           </Banner>
-          <Slider fun={getMovies} title={"현재상영중인 영화"} />
-          <Slider fun={popularMovies} title={"인기있는 영화"} />
-          <Slider fun={topMovies} title={"평점좋은 영화"} />
-          <Slider fun={upComingMovies} title={"개봉예정인 영화"} />
-
+          <Slider fun={getMovies} title={"현재상영중인 영화"} kind="movies" />
+          <Slider fun={popularMovies} title={"인기있는 영화"} kind="movies" />
+          <Slider fun={topMovies} title={"평점좋은 영화"} kind="movies" />
+          <Slider
+            fun={upComingMovies}
+            title={"개봉예정인 영화"}
+            kind="movies"
+            movie
+          />
           <AnimatePresence>{isOverlay ? <Overlay /> : null}</AnimatePresence>
         </>
       )}

@@ -2,11 +2,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { useQuery } from "react-query";
 import { styled } from "styled-components";
-import { IGetMoviesResult } from "../api";
+import { IGetMoviesResult, ISearchTv } from "../api";
 import { useHistory } from "react-router-dom";
 import { makeImagePath } from "../util";
 
-const Wrapper = styled.div`
+const Wrapper = styled(motion.div)`
   position: relative;
   height: 50vh;
 `;
@@ -28,7 +28,7 @@ const SliderBtn = styled(motion.div)`
   display: flex;
   justify-content: center;
   align-items: center;
-  opacity: 0.7;
+  opacity: 0;
   font-size: 25px;
   cursor: pointer;
 `;
@@ -135,15 +135,22 @@ const rowVariants = {
   },
 };
 
+const btnVariants = {
+  hover: {
+    opacity: 0.7,
+  },
+};
+
 const offset = 6;
 
-function Slider({ fun, title }: any) {
+function Slider({ fun, title, kind }: any) {
   const history = useHistory();
   const [isBack, setIsBack] = useState(false);
   const [index, setIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
   const toggleLeaving = () => setLeaving((prev) => !prev);
   const { data: movie } = useQuery<IGetMoviesResult>(["movies", title], fun);
+  const { data: tv } = useQuery<ISearchTv>(["tv", title], fun);
 
   const nextSlide = () => {
     if (movie) {
@@ -168,52 +175,113 @@ function Slider({ fun, title }: any) {
   };
 
   const onBoxClicked = (id: number) => {
-    history.push(`movies/${id}`);
+    history.push(`${kind}/${id}`);
   };
   return (
-    <Wrapper>
-      <SlderTitle>{title}</SlderTitle>
-      <AnimatePresence
-        initial={false}
-        onExitComplete={toggleLeaving}
-        custom={isBack}
-      >
-        <Row
-          key={index}
-          variants={rowVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          transition={{ type: "tween", duration: 1 }}
-          whileHover="hover"
-          custom={isBack}
-        >
-          {movie?.results
-            .slice(1)
-            .slice(index * offset, index * offset + offset)
-            .map((movie) => (
-              <Box
-                key={movie.id}
-                bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
-                variants={boxVariants}
-                initial="normal"
-                whileHover="hover"
-                transition={{ type: "tween" }}
-                onClick={() => onBoxClicked(movie.id)}
-              >
-                <Title>{movie.title}</Title>
-                <Info variants={infoVariants}>
-                  <Vote>★ {movie.vote_average.toFixed(1)}</Vote>
-                  <Release>개봉일: {movie.release_date}</Release>
-                </Info>
-              </Box>
-            ))}
-        </Row>
-      </AnimatePresence>
-      <SliderBtn onClick={prevSlide}>◀️</SliderBtn>
-      <SliderBtn style={{ right: 0 }} onClick={nextSlide}>
-        ▶️
-      </SliderBtn>
+    <Wrapper whileHover="hover">
+      {kind === "movies" ? (
+        <>
+          <SlderTitle>{title}</SlderTitle>
+          <AnimatePresence
+            initial={false}
+            onExitComplete={toggleLeaving}
+            custom={isBack}
+          >
+            <Row
+              key={index}
+              variants={rowVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              transition={{ type: "tween", duration: 1 }}
+              whileHover="hover"
+              custom={isBack}
+            >
+              {movie?.results
+                .slice(1)
+                .slice(index * offset, index * offset + offset)
+                .map((movie) => (
+                  <Box
+                    key={movie.id}
+                    bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
+                    variants={boxVariants}
+                    initial="normal"
+                    whileHover="hover"
+                    transition={{ type: "tween" }}
+                    onClick={() => onBoxClicked(movie.id)}
+                  >
+                    <Title>{movie.title}</Title>
+                    <Info variants={infoVariants}>
+                      <Vote>★ {movie.vote_average.toFixed(1)}</Vote>
+                      <Release>개봉일: {movie.release_date}</Release>
+                    </Info>
+                  </Box>
+                ))}
+            </Row>
+          </AnimatePresence>
+          <SliderBtn variants={btnVariants} onClick={prevSlide}>
+            ◀️
+          </SliderBtn>
+          <SliderBtn
+            variants={btnVariants}
+            style={{ right: 0 }}
+            onClick={nextSlide}
+          >
+            ▶️
+          </SliderBtn>
+        </>
+      ) : (
+        <>
+          <SlderTitle>{title}</SlderTitle>
+          <AnimatePresence
+            initial={false}
+            onExitComplete={toggleLeaving}
+            custom={isBack}
+          >
+            <Row
+              key={index}
+              variants={rowVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              transition={{ type: "tween", duration: 1 }}
+              whileHover="hover"
+              custom={isBack}
+            >
+              {tv?.results
+                .slice(1)
+                .slice(index * offset, index * offset + offset)
+                .map((tv) => (
+                  <Box
+                    key={tv.id}
+                    bgPhoto={makeImagePath(tv.backdrop_path, "w500")}
+                    variants={boxVariants}
+                    initial="normal"
+                    whileHover="hover"
+                    transition={{ type: "tween" }}
+                    onClick={() => onBoxClicked(tv.id)}
+                  >
+                    <Title>{tv.name}</Title>
+                    <Info variants={infoVariants}>
+                      <Vote>★ {tv.vote_average.toFixed(1)}</Vote>
+                      <Release>시즌시작일: {tv.first_air_date}</Release>
+                    </Info>
+                  </Box>
+                ))}
+            </Row>
+          </AnimatePresence>
+          <SliderBtn variants={btnVariants} onClick={prevSlide}>
+            ◀️
+          </SliderBtn>
+          <SliderBtn
+            variants={btnVariants}
+            style={{ right: 0 }}
+            onClick={nextSlide}
+          >
+            ▶️
+          </SliderBtn>
+        </>
+      )}
     </Wrapper>
   );
 }

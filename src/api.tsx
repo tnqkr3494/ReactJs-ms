@@ -101,6 +101,12 @@ export function getMovies() {
   ).then((response) => response.json());
 }
 
+export function getTv() {
+  return fetch(
+    `${BASE_PATH}/tv/airing_today?api_key=${API_KEY}&language=ko`
+  ).then((response) => response.json());
+}
+
 export function getMoviesDetail(id: number) {
   return fetch(`${BASE_PATH}/movie/${id}?api_key=${API_KEY}&language=ko`).then(
     (reponse) => reponse.json()
@@ -119,10 +125,22 @@ export function popularMovies() {
   ).then((response) => response.json());
 }
 
+export function popularTv() {
+  return fetch(`${BASE_PATH}/tv/popular?api_key=${API_KEY}&language=ko`).then(
+    (response) => response.json()
+  );
+}
+
 export function topMovies() {
   return fetch(
     `${BASE_PATH}/movie/top_rated?api_key=${API_KEY}&language=ko`
   ).then((response) => response.json());
+}
+
+export function topTv() {
+  return fetch(`${BASE_PATH}/tv/top_rated?api_key=${API_KEY}&language=ko`).then(
+    (response) => response.json()
+  );
 }
 
 export function upComingMovies() {
